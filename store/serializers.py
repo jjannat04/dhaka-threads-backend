@@ -37,19 +37,30 @@ class ReviewSerializer(serializers.ModelSerializer):
 class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
-        fields = "__all__"
-
+        
+        fields = ['product', 'quantity']
 
 class OrderSerializer(serializers.ModelSerializer):
-    items = OrderItemSerializer(many=True, read_only=True)
-    
-    
+    # 'items' must match the related_name in your OrderItem model
+    items = OrderItemSerializer(many=True) 
     user = serializers.ReadOnlyField(source='user.username')
 
     class Meta:
         model = Order
         fields = ['id', 'user', 'total_amount', 'address', 'full_name', 'items', 'created_at']
 
+    def create(self, validated_data):
+        # 1. Pop the nested items data out
+        items_data = validated_data.pop('items')
+        
+        # 2. Create the main Order object
+        order = Order.objects.create(**validated_data)
+        
+        # 3. Create each OrderItem and link it to the new order
+        for item_data in items_data:
+            OrderItem.objects.create(order=order, **item_data)
+            
+        return order
 # serializers.py
 class OrderSerializer(serializers.ModelSerializer):
     # This tells DRF: "Don't expect this in the React POST body, 
