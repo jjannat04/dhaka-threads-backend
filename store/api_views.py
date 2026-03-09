@@ -321,90 +321,66 @@ class RelatedProductsAPI(generics.ListAPIView):
         return Product.objects.filter(
             category=product.category
         ).exclude(id=product_id)[:5]
-
 import requests
 from django.conf import settings
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 @api_view(["POST"])
+@permission_classes([IsAuthenticated])
 def create_payment(request):
-
     order_id = request.data.get("order_id")
     total_amount = request.data.get("total_amount")
-
+    
+    # SSLCommerz requires a unique Transaction ID
     tran_id = f"ORDER_{order_id}"
 
     data = {
         "store_id": settings.SSLCOMMERZ_STORE_ID,
         "store_passwd": settings.SSLCOMMERZ_STORE_PASS,
-
         "total_amount": total_amount,
         "currency": "BDT",
-
         "tran_id": tran_id,
 
         "success_url": "https://final-exam-delta-two.vercel.app/api/payment/success/",
         "fail_url": "https://final-exam-delta-two.vercel.app/api/payment/fail/",
         "cancel_url": "https://final-exam-delta-two.vercel.app/api/payment/cancel/",
 
-        # customer info
-        "cus_name": "Customer",
-        "cus_email": "customer@email.com",
-        "cus_phone": "01700000000",
-        "cus_add1": "Dhaka",
+        # CUSTOMER INFO (All these are mandatory for session init)
+        "cus_name": request.data.get("full_name", "Customer"),
+        "cus_email": request.user.email or "customer@email.com",
+        "cus_phone": "01700000000", # Must be a valid format
+        "cus_add1": request.data.get("address", "Dhaka"),
         "cus_city": "Dhaka",
+        "cus_postcode": "1000", # MANDATORY FIELD - usually missing!
         "cus_country": "Bangladesh",
 
-        # product info
+        # PRODUCT INFO
         "product_name": "Dhaka Threads Order",
         "product_category": "Clothing",
         "product_profile": "general",
 
-        # shipping info
+        # SHIPPING INFO
         "shipping_method": "NO",
         "num_of_item": 1,
     }
 
-    response = requests.post(
-        "https://sandbox.sslcommerz.com/gwprocess/v4/api.php",
-        data=data
-    )
-
+    # Use the V4 API endpoint
+    api_url = "https://sandbox.sslcommerz.com/gwprocess/v4/api.php"
+    
+    response = requests.post(api_url, data=data)
     payment_data = response.json()
 
-    # DEBUG (very helpful)
-    print(payment_data)
+    # Log this in your Vercel logs to see the 'failedreason' if it's empty
+    print("SSLCommerz Full Response:", payment_data)
 
-    return Response({
-        "gateway_url": payment_data.get("GatewayPageURL")
-    })
-
-
-@api_view(["POST"])
-def payment_success(request):
-
-    tran_id = request.data.get("tran_id")
-
-    try:
-        order_id = tran_id.split("_")[1]
-
-        from .models import Order
-        order = Order.objects.get(id=order_id)
-
-        order.status = "PAID"
-        order.save()
-
-    except Exception as e:
-        return Response({"error": str(e)})
-
-    return Response({"message": "Payment successful"})
-
-
-@api_view(["POST"])
-def payment_fail(request):
-    return Response({"message": "Payment failed"})
-
-@api_view(["POST"])
-def payment_cancel(request):
-    return Response({"message": "Payment cancelled"})    
+    if payment_data.get("status") == "SUCCESS":
+        return Response({
+            "gateway_url": payment_data.get("GatewayPageURL")
+        })
+    else:
+        return Response({
+            "error": "Failed to initialize payment",
+            "failed_reason": payment_data.get("failedreason")
+        }, status=400)
