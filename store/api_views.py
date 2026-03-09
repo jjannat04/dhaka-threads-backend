@@ -390,4 +390,13 @@ def create_payment(request):
 @api_view(["POST"])
 def payment_success(request):
     # ... your code ...
-    return Response({"message": "Payment successful"})    
+    return Response({"message": "Payment successful"})
+
+from django.shortcuts import redirect
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+@api_view(['POST', 'GET'])
+def payment_fail(request):
+    # This matches the path in your store/urls.py
+    return Response({"status": "failed", "message": "Payment was not successful."})    
