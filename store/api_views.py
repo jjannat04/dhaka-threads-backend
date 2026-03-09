@@ -386,22 +386,33 @@ def create_payment(request):
         }, status=400)
     
 # store/api_views.py
-
-@api_view(["POST"])
-def payment_success(request):
-    # ... your code ...
-    return Response({"message": "Payment successful"})
-
 from django.shortcuts import redirect
-from rest_framework.decorators import api_view
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
+@csrf_exempt
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def payment_success(request):
+    # Log the data to your console so you can see what SSLCOMMERZ sent
+    print("Payment Data:", request.data)
+    
+    # TODO: Add logic here to update your Order status in the database
+    # Example: tran_id = request.data.get('tran_id')
+    
+    return Response({"message": "Payment successful"})
+    
+
+@csrf_exempt
 @api_view(['POST', 'GET'])
+@permission_classes([AllowAny])
 def payment_fail(request):
-    # This matches the path in your store/urls.py
     return Response({"status": "failed", "message": "Payment was not successful."})    
 
+@csrf_exempt
 @api_view(['POST', 'GET'])
+@permission_classes([AllowAny])
 def payment_cancel(request):
-    # This can redirect to a 'cancelled' page on your React frontend
     return Response({"status": "cancelled", "message": "Payment was cancelled by the user."})
