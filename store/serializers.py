@@ -41,9 +41,10 @@ class OrderItemSerializer(serializers.ModelSerializer):
         model = OrderItem
         fields = ['product', 'quantity']
 
+# serializers.py
+
 class OrderSerializer(serializers.ModelSerializer):
-    # 'items' must match the related_name in your OrderItem model
-    items = OrderItemSerializer(many=True) 
+    items = OrderItemSerializer(many=True)
     user = serializers.ReadOnlyField(source='user.username')
 
     class Meta:
@@ -51,15 +52,20 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'total_amount', 'address', 'full_name', 'items', 'created_at']
 
     def create(self, validated_data):
-        # 1. Pop the nested items data out
-        items_data = validated_data.pop('items')
-        
-        # 2. Create the main Order object
+        items_data = validated_data.pop('items', [])
         order = Order.objects.create(**validated_data)
         
-        # 3. Create each OrderItem and link it to the new order
         for item_data in items_data:
-            OrderItem.objects.create(order=order, **item_data)
+            # item_data['product'] is the Product object because of the Serializer validation
+            product = item_data['product']
+            
+            # THE FIX: Manually assign the price from the product to the order item
+            OrderItem.objects.create(
+                order=order, 
+                product=product,
+                quantity=item_data['quantity'],
+                price=product.price  # Grabbing the current price of the product
+            )
             
         return order
       
