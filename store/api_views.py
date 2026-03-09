@@ -1,4 +1,4 @@
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, AllowAny
 from .models import Product, Review, Order
 from .serializers import ProductSerializer, ReviewSerializer, OrderSerializer
 from django.contrib.auth import get_user_model
@@ -261,7 +261,7 @@ from .serializers import WishlistSerializer
 
 class WishlistAPI(generics.ListCreateAPIView):
     serializer_class = WishlistSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
         return Wishlist.objects.filter(user=self.request.user)
