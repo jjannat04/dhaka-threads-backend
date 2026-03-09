@@ -294,7 +294,6 @@ from django.conf import settings
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-
 @api_view(["POST"])
 def create_payment(request):
 
@@ -316,14 +315,20 @@ def create_payment(request):
         "fail_url": "https://final-exam-delta-two.vercel.app/api/payment/fail/",
         "cancel_url": "https://final-exam-delta-two.vercel.app/api/payment/cancel/",
 
+        # customer info
         "cus_name": "Customer",
         "cus_email": "customer@email.com",
         "cus_phone": "01700000000",
+        "cus_add1": "Dhaka",
+        "cus_city": "Dhaka",
+        "cus_country": "Bangladesh",
 
+        # product info
         "product_name": "Dhaka Threads Order",
         "product_category": "Clothing",
         "product_profile": "general",
 
+        # shipping info
         "shipping_method": "NO",
         "num_of_item": 1,
     }
@@ -335,9 +340,13 @@ def create_payment(request):
 
     payment_data = response.json()
 
+    # DEBUG (very helpful)
+    print(payment_data)
+
     return Response({
-        "gateway_url": payment_data["GatewayPageURL"]
+        "gateway_url": payment_data.get("GatewayPageURL")
     })
+
 
 @api_view(["POST"])
 def payment_success(request):
