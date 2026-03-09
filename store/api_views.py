@@ -31,6 +31,7 @@ from datetime import timedelta
 from rest_framework.permissions import IsAdminUser
 from django.contrib.auth import get_user_model
 
+from rest_framework.authtoken.models import Token
 
 
 class AdminDashboardAPI(APIView):
@@ -200,12 +201,12 @@ class RegisterAPI(APIView):
             {"message": "User registered. Check email to activate account."},
             status=status.HTTP_201_CREATED
         )    
-    
+
+
 class LoginAPI(APIView):
     """
     Login user
     """
-
     def post(self, request):
         username = request.data.get("username")
         password = request.data.get("password")
@@ -218,11 +219,18 @@ class LoginAPI(APIView):
         if not user.is_active:
             return Response({"error": "Account not activated"}, status=403)
 
+        # Generate or retrieve the token for this user
+        token, created = Token.objects.get_or_create(user=user)
+
+        # Standard session login (optional, but keep it if you use Admin panel)
         login(request, user)
 
-        return Response({"message": "Login successful"}) 
-
-
+        # THE CRITICAL CHANGE: Return the token key to React
+        return Response({
+            "message": "Login successful",
+            "token": token.key,
+            "username": user.username
+        })
 
 class LogoutAPI(APIView):
     """

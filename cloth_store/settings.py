@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'cloudinary',
     'rest_framework',
+    'rest_framework.authtoken',
     'drf_yasg',
     'store',
     'corsheaders',
@@ -136,3 +137,13 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 SSLCOMMERZ_STORE_ID = os.getenv("SSLCOMMERZ_STORE_ID")
 SSLCOMMERZ_STORE_PASS = os.getenv("SSLCOMMERZ_STORE_PASS")
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication', # MUST BE HERE
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+}
