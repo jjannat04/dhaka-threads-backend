@@ -150,3 +150,10 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
 }
+
+# Securely fetch credentials with fallbacks
+SSLCOMMERZ_STORE_ID = os.getenv("SSLCOMMERZ_STORE_ID", "dhaka69aef1d119a3e")
+SSLCOMMERZ_STORE_PASS = os.getenv("SSLCOMMERZ_STORE_PASS", "dhaka69aef1d119a3e@ssl")
+
+# Add this to toggle between Sandbox and Live
+SSLCOMMERZ_IS_SANDBOX = os.getenv("SSLCOMMERZ_IS_SANDBOX", "True") == "True"
