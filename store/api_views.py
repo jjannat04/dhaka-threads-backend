@@ -79,9 +79,10 @@ class AdminDashboardAPI(APIView):
 
 
 
-
-class ProductListAPI(generics.ListAPIView):
+from rest_framework.parsers import MultiPartParser, FormParser
+class ProductListCreateAPI(generics.ListCreateAPIView):
     serializer_class = ProductSerializer
+    parser_classes = (MultiPartParser, FormParser)
 
     def get_queryset(self):
         queryset = Product.objects.all()
@@ -105,12 +106,10 @@ class ProductListAPI(generics.ListAPIView):
         return queryset
 
 
-class ProductDetailAPI(generics.RetrieveAPIView):
-    """
-    Returns single product
-    """
+class ProductDetailAPI(generics.RetrieveUpdateDestroyAPIView): # NOT RetrieveAPIView
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    parser_classes = (MultiPartParser, FormParser)
 
 
 class ReviewCreateAPI(generics.CreateAPIView):
@@ -165,15 +164,21 @@ class OrderCreateAPI(generics.CreateAPIView):
         except Exception as e:
             print(f"Email Error: {e}")
 
-class OrderListAPI(generics.ListAPIView):
-    """
-    Show logged in user's orders
-    """
+class OrderListAPI(generics.ListCreateAPIView): # Changed to ListCreate
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        # If the user is an admin, show ALL orders. 
+        # If not, only show their own.
+        if self.request.user.is_staff:
+            return Order.objects.all()
         return Order.objects.filter(user=self.request.user)
+
+class OrderDetailAPI(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 class ProductReviewsAPI(generics.ListAPIView):
     serializer_class = ReviewSerializer
