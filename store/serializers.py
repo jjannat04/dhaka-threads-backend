@@ -2,11 +2,17 @@ from rest_framework import serializers
 from django.db.models import Avg
 from .models import User, Product, Category, Review, Order, OrderItem
 
+from django.contrib.auth.models import User
+from rest_framework import serializers
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "username", "email"]
+        # Adding first_name and last_name for a better profile experience
+        fields = ["id", "username", "email", "first_name", "last_name"]
+        
+        # Keep username and email read-only so they don't change login data here
+        read_only_fields = ["username", "email"]
 
 
 class CategorySerializer(serializers.ModelSerializer):

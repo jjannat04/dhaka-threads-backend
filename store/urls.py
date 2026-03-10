@@ -34,5 +34,6 @@ urlpatterns = [
     path("payment/success/", api_views.payment_success),
     path("payment/fail/", api_views.payment_fail),
     path("payment/cancel/", api_views.payment_cancel),
+    path("profile/", api_views.UserProfileAPI.as_view(), name="user-profile"),
 
 ]
