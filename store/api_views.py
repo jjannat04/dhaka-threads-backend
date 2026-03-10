@@ -120,7 +120,7 @@ class ReviewCreateAPI(generics.CreateAPIView):
         # This automatically sets the 'user' field to the logged-in user
         serializer.save(user=self.request.user)
 
-        
+
 class OrderCreateAPI(generics.CreateAPIView):
     """
     Create an order and send a detailed confirmation email
@@ -226,7 +226,7 @@ class RegisterAPI(APIView):
             f"Click this link to activate your account:\n{activation_link}",
             settings.DEFAULT_FROM_EMAIL,
             [user.email],
-            fail_silently=True
+            fail_silently=False
         )
 
         return Response(
