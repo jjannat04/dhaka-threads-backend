@@ -22,10 +22,9 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = '__all__' # Or list your specific fields
+        fields = '__all__' 
 
     def get_average_rating(self, obj):
-        # This looks at all related reviews and calculates the average 'rating'
         average = obj.reviews.aggregate(Avg('rating'))['rating__avg']
         return round(average, 1) if average else 0
 
@@ -37,10 +36,9 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = "__all__"
-        read_only_fields = ['user'] # User is set automatically by the view
+        read_only_fields = ['user'] 
         
 class OrderItemSerializer(serializers.ModelSerializer):
-    # Use an explicit PrimaryKeyRelatedField to bypass hidden validation issues
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
 
     class Meta:
@@ -63,15 +61,13 @@ class OrderSerializer(serializers.ModelSerializer):
         order = Order.objects.create(**validated_data)
         
         for item_data in items_data:
-            # item_data['product'] is the Product object because of the Serializer validation
             product = item_data['product']
-            
-            # THE FIX: Manually assign the price from the product to the order item
+
             OrderItem.objects.create(
                 order=order, 
                 product=product,
                 quantity=item_data['quantity'],
-                price=product.price  # Grabbing the current price of the product
+                price=product.price  
             )
             
         return order

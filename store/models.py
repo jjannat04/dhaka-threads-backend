@@ -8,7 +8,7 @@ class User(AbstractUser):
     is_admin = models.BooleanField(default=False)
     phone_number = models.CharField(max_length=15, blank=True)
 
-# 2. CATEGORY & PRODUCT
+
 class Category(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
@@ -37,7 +37,7 @@ class Product(models.Model):
 
     def __str__(self): return self.name
 
-# 3. ORDER & WISHLIST
+
 
 class Order(models.Model):
     STATUS_CHOICES = (
@@ -88,7 +88,7 @@ class Wishlist(models.Model):
     def __str__(self):
         return f"{self.user} -> {self.product}"
 
-# 4. REVIEW
+
 class Review(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
     user = models.ForeignKey(User, on_delete=models.CASCADE)

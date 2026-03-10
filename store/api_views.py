@@ -3,8 +3,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import generics, permissions
 from rest_framework.permissions import AllowAny
-from .models import Product, Review, Order
-from .serializers import ProductSerializer, ReviewSerializer, OrderSerializer
+from .models import Product, Review, Order, Wishlist
+from .serializers import ProductSerializer, ReviewSerializer, OrderSerializer, WishlistSerializer
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode
@@ -15,24 +15,24 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate, login, logout
-
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
-from django.core.mail import send_mail
-from django.conf import settings
-
-
-
-
-
 from django.db.models import Count, Sum
 from django.utils import timezone
 from datetime import timedelta
 from rest_framework.permissions import IsAdminUser
 from django.contrib.auth import get_user_model
-
 from rest_framework.authtoken.models import Token
-
+from django.shortcuts import redirect
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from django.core.mail import send_mail
+from django.conf import settings
+import requests
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser
 
 class AdminDashboardAPI(APIView):
     permission_classes = [IsAdminUser]
@@ -76,10 +76,6 @@ class AdminDashboardAPI(APIView):
         })
 
 
-
-
-
-from rest_framework.parsers import MultiPartParser, FormParser
 class ProductListCreateAPI(generics.ListCreateAPIView):
     serializer_class = ProductSerializer
     parser_classes = (MultiPartParser, FormParser)
@@ -106,7 +102,7 @@ class ProductListCreateAPI(generics.ListCreateAPIView):
         return queryset
 
 
-class ProductDetailAPI(generics.RetrieveUpdateDestroyAPIView): # NOT RetrieveAPIView
+class ProductDetailAPI(generics.RetrieveUpdateDestroyAPIView): 
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     parser_classes = (MultiPartParser, FormParser)
@@ -117,7 +113,6 @@ class ReviewCreateAPI(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        # This automatically sets the 'user' field to the logged-in user
         serializer.save(user=self.request.user)
 
 
@@ -130,17 +125,13 @@ class OrderCreateAPI(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        # 1. Save order with the authenticated user
         order = serializer.save(user=self.request.user)
 
-        # 2. Build a list of items for the email
-        # Assuming your Order model has an 'items' related_name or similar
         item_summary = ""
-        # If your OrderItem model has a 'product' field with a 'name'
+        
         for item in order.items.all():
             item_summary += f"- {item.product.name} (Qty: {item.quantity})\n"
 
-        # 3. Prepare Email Content
         subject = f"Order Confirmed! Dhaka Threads #{order.id}"
         body = (
             f"Hi {self.request.user.username},\n\n"
@@ -151,26 +142,22 @@ class OrderCreateAPI(generics.CreateAPIView):
             f"Shipping to: {order.address}\n\n"
             f"Thank you for shopping with Dhaka Threads!"
         )
-
-        # 4. Send the Mail
         try:
             send_mail(
                 subject,
                 body,
                 settings.EMAIL_HOST_USER,
                 [self.request.user.email],
-                fail_silently=False, # Set to False to see errors in terminal
+                fail_silently=False, 
             )
         except Exception as e:
             print(f"Email Error: {e}")
 
-class OrderListAPI(generics.ListCreateAPIView): # Changed to ListCreate
+class OrderListAPI(generics.ListCreateAPIView):
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # If the user is an admin, show ALL orders. 
-        # If not, only show their own.
         if self.request.user.is_staff:
             return Order.objects.all()
         return Order.objects.filter(user=self.request.user)
@@ -193,14 +180,14 @@ class ProductReviewsAPI(generics.ListAPIView):
 class RegisterAPI(APIView):
     permission_classes = [permissions.AllowAny]
     def post(self, request):
-        print("--- Registration Started ---") # Check 1
+        print("--- Registration Started ---") 
         User = get_user_model()
 
         username = request.data.get("username")
         email = request.data.get("email")
         password = request.data.get("password")
         
-        print(f"Data received: {username}, {email}") # Check 2
+        print(f"Data received: {username}, {email}") 
 
         if not username or not email or not password:
             print("Error: Missing fields")
@@ -216,14 +203,14 @@ class RegisterAPI(APIView):
             password=password,
             is_active=False
         )
-        print(f"User created: {user.username}") # Check 3
+        print(f"User created: {user.username}") 
 
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         frontend_url = "https://dhaka-threads-client.vercel.app"
         activation_link = f"{frontend_url}/activate/{uid}/{token}/"
 
-        print("Attempting to send mail...") # Check 4
+        print("Attempting to send mail...") 
         try:
             send_mail(
                 "Activate your Dhaka Threads account",
@@ -232,7 +219,7 @@ class RegisterAPI(APIView):
                 [user.email],
                 fail_silently=False
             )
-            print("Mail function finished execution.") # Check 5
+            print("Mail function finished execution.") 
         except Exception as e:
             print(f"MAIL ERROR: {e}")
 
@@ -257,13 +244,9 @@ class LoginAPI(APIView):
         if not user.is_active:
             return Response({"error": "Account not activated"}, status=403)
 
-        # Generate or retrieve the token for this user
         token, created = Token.objects.get_or_create(user=user)
 
-        # Standard session login (optional, but keep it if you use Admin panel)
         login(request, user)
-
-        # THE CRITICAL CHANGE: Return the token key to React
         return Response({
             "message": "Login successful",
             "token": token.key,
@@ -306,8 +289,6 @@ class ActivateAccountAPI(APIView):
 
 
 
-from .models import Wishlist
-from .serializers import WishlistSerializer
 
 
 class WishlistAPI(generics.ListCreateAPIView):
@@ -334,11 +315,7 @@ class RelatedProductsAPI(generics.ListAPIView):
         return Product.objects.filter(
             category=product.category
         ).exclude(id=product_id)[:5]
-import requests
-from django.conf import settings
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
+
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
@@ -346,7 +323,6 @@ def create_payment(request):
     order_id = request.data.get("order_id")
     total_amount = request.data.get("total_amount")
     
-    # SSLCommerz requires a unique Transaction ID
     tran_id = f"ORDER_{order_id}"
 
     data = {
@@ -360,32 +336,26 @@ def create_payment(request):
         "fail_url": "https://final-exam-delta-two.vercel.app/api/payment/fail/",
         "cancel_url": "https://final-exam-delta-two.vercel.app/api/payment/cancel/",
 
-        # CUSTOMER INFO (All these are mandatory for session init)
         "cus_name": request.data.get("full_name", "Customer"),
         "cus_email": request.user.email or "customer@email.com",
-        "cus_phone": "01700000000", # Must be a valid format
+        "cus_phone": "01700000000", 
         "cus_add1": request.data.get("address", "Dhaka"),
         "cus_city": "Dhaka",
-        "cus_postcode": "1000", # MANDATORY FIELD - usually missing!
+        "cus_postcode": "1000", 
         "cus_country": "Bangladesh",
 
-        # PRODUCT INFO
         "product_name": "Dhaka Threads Order",
         "product_category": "Clothing",
         "product_profile": "general",
 
-        # SHIPPING INFO
         "shipping_method": "NO",
         "num_of_item": 1,
     }
-
-    # Use the V4 API endpoint
     api_url = "https://sandbox.sslcommerz.com/gwprocess/v4/api.php"
     
     response = requests.post(api_url, data=data)
     payment_data = response.json()
 
-    # Log this in your Vercel logs to see the 'failedreason' if it's empty
     print("SSLCommerz Full Response:", payment_data)
 
     if payment_data.get("status") == "SUCCESS":
@@ -398,18 +368,7 @@ def create_payment(request):
             "failed_reason": payment_data.get("failedreason")
         }, status=400)
     
-# store/api_views.py
-from django.shortcuts import redirect
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
-from rest_framework.response import Response
 
-from django.core.mail import send_mail
-from django.conf import settings
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
-from django.views.decorators.csrf import csrf_exempt
 
 
 @csrf_exempt

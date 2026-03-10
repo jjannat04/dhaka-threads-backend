@@ -3,7 +3,6 @@ import dj_database_url
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Load environment variables from .env
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -61,7 +60,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'cloth_store.wsgi.application'
 
-# Database
 DATABASES = {
     'default': dj_database_url.config(
         default=os.environ.get('DATABASE_URL'),
@@ -89,15 +87,12 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
-
-# Cloudinary Credentials
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
 
-# Email settings
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.environ.get('EMAIL_HOST')
@@ -110,10 +105,7 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER 
 SERVER_EMAIL = EMAIL_HOST_USER
 
-# settings.py
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# Security & Internationalization
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -155,10 +147,8 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
 }
-
-# Securely fetch credentials with fallbacks
 SSLCOMMERZ_STORE_ID = os.getenv("SSLCOMMERZ_STORE_ID", "dhaka69aef1d119a3e")
 SSLCOMMERZ_STORE_PASS = os.getenv("SSLCOMMERZ_STORE_PASS", "dhaka69aef1d119a3e@ssl")
 
-# Add this to toggle between Sandbox and Live
+
 SSLCOMMERZ_IS_SANDBOX = os.getenv("SSLCOMMERZ_IS_SANDBOX", "True") == "True"
