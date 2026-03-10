@@ -370,12 +370,14 @@ def create_payment(request):
     
 
 
+from django.shortcuts import redirect
+
+FRONTEND_URL = "https://dhaka-threads-client.vercel.app" 
 
 @csrf_exempt
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def payment_success(request):
-
     tran_id = request.data.get("tran_id") or request.GET.get("tran_id")
 
     if not tran_id:
@@ -390,30 +392,28 @@ def payment_success(request):
 
     order.status = "Paid"
     order.save()
+    
     send_mail(
-    subject=f"Payment Received - Dhaka Threads #{order.id}",
-    message=f"Hi {order.user.username},\n\nPayment received! Your order #{order.id} is now being processed.",
-    from_email=settings.EMAIL_HOST_USER,
-    recipient_list=[order.user.email],
-    fail_silently=False,
+        subject=f"Payment Received - Dhaka Threads #{order.id}",
+        message=f"Hi {order.user.username},\n\nPayment received! Your order #{order.id} is now being processed.",
+        from_email=settings.EMAIL_HOST_USER,
+        recipient_list=[order.user.email],
+        fail_silently=False,
     )
 
-    return Response({
-        "message": "Payment successful",
-        "order_id": order.id
-    })
+    return redirect(f"{FRONTEND_URL}/orders?payment=success")
 
 
 @csrf_exempt
 @api_view(['POST', 'GET'])
 @permission_classes([AllowAny])
 def payment_fail(request):
-    return Response({"status": "failed", "message": "Payment was not successful."})    
+    
+    return redirect(f"{FRONTEND_URL}/cart?payment=failed")
 
 @csrf_exempt
 @api_view(['POST', 'GET'])
 @permission_classes([AllowAny])
 def payment_cancel(request):
-    return Response({"status": "cancelled", "message": "Payment was cancelled by the user."})
-
-
+    
+    return redirect(f"{FRONTEND_URL}/cart?payment=cancelled")
