@@ -448,14 +448,3 @@ def payment_cancel(request):
     return Response({"status": "cancelled", "message": "Payment was cancelled by the user."})
 
 
-# api_views.py
-from rest_framework import generics, permissions
-from django.contrib.auth.models import User
-from .serializers import UserSerializer # Create this if you haven't
-
-class UserProfileAPI(generics.RetrieveUpdateAPIView):
-    permission_classes = [permissions.IsAuthenticated]
-    serializer_class = UserSerializer
-
-    def get_object(self):
-        return self.request.user
