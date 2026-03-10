@@ -111,16 +111,16 @@ class ProductDetailAPI(generics.RetrieveUpdateDestroyAPIView): # NOT RetrieveAPI
     serializer_class = ProductSerializer
     parser_classes = (MultiPartParser, FormParser)
 
-
 class ReviewCreateAPI(generics.CreateAPIView):
-    """
-    Create a product review
-    """
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def perform_create(self, serializer):
+        # This automatically sets the 'user' field to the logged-in user
+        serializer.save(user=self.request.user)
 
+        
 class OrderCreateAPI(generics.CreateAPIView):
     """
     Create an order and send a detailed confirmation email

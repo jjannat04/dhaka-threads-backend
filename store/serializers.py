@@ -37,7 +37,8 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = "__all__"
-
+        read_only_fields = ['user'] # User is set automatically by the view
+        
 class OrderItemSerializer(serializers.ModelSerializer):
     # Use an explicit PrimaryKeyRelatedField to bypass hidden validation issues
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
