@@ -1,34 +1,117 @@
-Dhaka Threads | Backend API Architecture
-This repository contains the RESTful API powering the Dhaka Threads e-commerce platform. Built with Django and Django REST Framework (DRF), the backend is designed to handle complex relational data, secure user authentication, and optimized product delivery.
+# 🛍️ Dhaka Threads — Full-Stack E-Commerce Platform
 
-View Live API Documentation: https://dhaka-threads-backend.vercel.app/swagger/  
-Live Demo: https://dhaka-threads-client.vercel.app/
+A modern, production-grade **fashion e-commerce platform** built with React.js and Django REST Framework. Features real-time product filtering, persistent cart/wishlist, JWT-secured authentication, and an editorial-style mobile-first UI.
 
-Frontend Repository: https://github.com/jjannat04/dhaka-threads-client
+🌐 **Live Demo:** [dhaka-threads-client.vercel.app](https://dhaka-threads-client.vercel.app/)
+&nbsp;|&nbsp;
+💻 **Frontend Repo:** [github.com/jjannat04/dhaka-threads-client](https://github.com/jjannat04/dhaka-threads-client)
+&nbsp;|&nbsp;
+🔧 **Backend Repo:** [github.com/jjannat04/dhaka-threads-backend](https://github.com/jjannat04/dhaka-threads-backend)
 
-Technical Specifications
-The backend architecture prioritizes data integrity, security, and query performance. It provides a structured interface for the React frontend to consume product data and manage user interactions.
+---
 
-Core Functionality
-RESTful Resource Management: Full CRUD capabilities for products, categories, and reviews, organized through decoupled serializers.
+## 📸 Preview
 
-JWT Authentication: Secure user sessions implemented via SimpleJWT, providing stateless authentication for reviews and profile management.
+> _Add a screenshot of your storefront or product page here._
+> `![App Screenshot](./screenshots/home.png)`
 
-Relational Schema Design: An optimized database structure managing One-to-Many (Categories to Products) and Many-to-Many relationships.
+---
 
-Advanced Filtering Engine: Backend-level filtering logic that processes query parameters for size, color, and availability, reducing frontend processing load.
+## 🧩 Tech Stack
 
-Automated Analytics: Aggregation logic to calculate average ratings and review counts dynamically for each product.
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React.js, Context API, CSS3 |
+| Backend | Django, Django REST Framework (DRF) |
+| Database | PostgreSQL / SQLite |
+| Auth | JWT (JSON Web Token) |
+| Deployment | Vercel (Frontend) |
 
-CORS Configuration: Fine-tuned Cross-Origin Resource Sharing settings to ensure secure communication with the React frontend.
+---
 
-Technology Stack
-Framework: Django 4+
+## ✨ Features
 
-API Toolkit: Django REST Framework (DRF)
+- 🔍 **Real-Time Product Filtering** — Dynamic product engine with async API fetching; filters by category, price, and more without page reloads
+- 🛒 **Persistent Cart & Wishlist** — Global state management via React Context API; cart and wishlist survive across page navigation
+- 🔐 **JWT Authentication** — Secure login/register flow with token-based auth protecting all user-specific actions
+- ⭐ **Review & Rating System** — Verified users can leave product reviews and star ratings
+- 📱 **Mobile-First UI** — Editorial-style design with glassmorphism effects and smooth CSS transitions, fully responsive
+- 👤 **User Dashboard** — Personalized profile with order history and wishlist management
 
-Database: PostgreSQL (Production) / SQLite (Development)
+---
 
-Authentication: JSON Web Tokens (JWT)
+## 📦 Frontend Dependencies
 
-Environment Management: Python-decouple / Dotenv
+```json
+{
+  "react": "^18.x",
+  "react-dom": "^18.x",
+  "react-router-dom": "^6.x",
+  "axios": "^1.x"
+}
+```
+
+> Full list in [`package.json`](./package.json)
+
+---
+
+## 🚀 Run Locally
+
+### Prerequisites
+- Node.js >= 18
+- Backend server running (see [backend repo](https://github.com/jjannat04/dhaka-threads-backend))
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/jjannat04/dhaka-threads-client.git
+cd dhaka-threads-client
+```
+
+### 2. Install Dependencies
+
+```bash
+npm install
+```
+
+### 3. Configure Environment Variables
+
+Create a `.env` file in the root directory:
+
+```env
+REACT_APP_API_URL=http://127.0.0.1:8000/api
+```
+
+### 4. Start the Development Server
+
+```bash
+npm start
+```
+
+Open your browser at 👉 `http://localhost:3000`
+
+---
+
+## 🔗 Relevant Links
+
+| Resource | Link |
+|----------|------|
+| 🌐 Live Demo | [dhaka-threads-client.vercel.app](https://dhaka-threads-client.vercel.app/) |
+| 💻 Frontend Repo | [github.com/jjannat04/dhaka-threads-client](https://github.com/jjannat04/dhaka-threads-client) |
+| 🔧 Backend Repo | [github.com/jjannat04/dhaka-threads-backend](https://github.com/jjannat04/dhaka-threads-backend) |
+| 👤 Developer | [linkedin.com/in/jannatul-ferdous-b504831b3](https://www.linkedin.com/in/jannatul-ferdous-b504831b3/) |
+
+---
+
+## 👩‍💻 Author
+
+**Jannatul Ferdous**
+CSE Undergraduate @ CUET | Django & React Developer
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/jannatul-ferdous-b504831b3/)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)](https://github.com/jjannat04)
+[![Codeforces](https://img.shields.io/badge/Codeforces-1F8ACB?style=flat&logo=codeforces&logoColor=white)](https://codeforces.com/profile/jjasperruby)
+
+---
+
+> ⭐ If you found this project useful, consider giving it a star!
