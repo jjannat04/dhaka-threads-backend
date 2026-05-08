@@ -1,19 +1,12 @@
-# 🛍️ Dhaka Threads — Full-Stack E-Commerce Platform
+# 🔧 Dhaka Threads — Backend API
 
-A modern, production-grade **fashion e-commerce platform** built with React.js and Django REST Framework. Features real-time product filtering, persistent cart/wishlist, JWT-secured authentication, and an editorial-style mobile-first UI.
+The RESTful backend powering the **Dhaka Threads** e-commerce platform. Built with Django REST Framework, it handles product management, user authentication, cart logic, reviews, and secure JWT-based sessions.
 
 🌐 **Live Demo:** [dhaka-threads-client.vercel.app](https://dhaka-threads-client.vercel.app/)
 &nbsp;|&nbsp;
-💻 **Frontend Repo:** [github.com/jjannat04/dhaka-threads-client](https://github.com/jjannat04/dhaka-threads-client)
+🖥️ **Frontend Repo:** [github.com/jjannat04/dhaka-threads-client](https://github.com/jjannat04/dhaka-threads-client)
 &nbsp;|&nbsp;
 🔧 **Backend Repo:** [github.com/jjannat04/dhaka-threads-backend](https://github.com/jjannat04/dhaka-threads-backend)
-
----
-
-## 📸 Preview
-
-> _Add a screenshot of your storefront or product page here._
-> `![App Screenshot](./screenshots/home.png)`
 
 ---
 
@@ -21,74 +14,102 @@ A modern, production-grade **fashion e-commerce platform** built with React.js a
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | React.js, Context API, CSS3 |
-| Backend | Django, Django REST Framework (DRF) |
+| Backend Framework | Django, Django REST Framework (DRF) |
 | Database | PostgreSQL / SQLite |
-| Auth | JWT (JSON Web Token) |
-| Deployment | Vercel (Frontend) |
+| Auth | JWT via `djangorestframework-simplejwt` |
+| API Style | RESTful JSON API |
+| Deployment | Render |
 
 ---
 
-## ✨ Features
+## ✨ API Features
 
-- 🔍 **Real-Time Product Filtering** — Dynamic product engine with async API fetching; filters by category, price, and more without page reloads
-- 🛒 **Persistent Cart & Wishlist** — Global state management via React Context API; cart and wishlist survive across page navigation
-- 🔐 **JWT Authentication** — Secure login/register flow with token-based auth protecting all user-specific actions
-- ⭐ **Review & Rating System** — Verified users can leave product reviews and star ratings
-- 📱 **Mobile-First UI** — Editorial-style design with glassmorphism effects and smooth CSS transitions, fully responsive
-- 👤 **User Dashboard** — Personalized profile with order history and wishlist management
+- 🔐 **JWT Authentication** — Secure token-based login, register, refresh, and logout endpoints
+- 🛍️ **Product API** — Full CRUD for products with category, price, and stock management
+- 🔍 **Filtering & Search** — Query products by category, price range, and keywords
+- ⭐ **Reviews & Ratings** — Authenticated users can post, edit, and delete reviews per product
+- 🛒 **Cart & Wishlist** — User-scoped cart and wishlist endpoints with persistent server-side storage
+- 👤 **User Profile** — Profile retrieval and update endpoints
 
 ---
 
-## 📦 Frontend Dependencies
+## 📦 Dependencies
 
-```json
-{
-  "react": "^18.x",
-  "react-dom": "^18.x",
-  "react-router-dom": "^6.x",
-  "axios": "^1.x"
-}
+```txt
+Django>=4.2
+djangorestframework
+djangorestframework-simplejwt
+django-cors-headers
+Pillow
+psycopg2-binary
+gunicorn
+whitenoise
+python-decouple
 ```
 
-> Full list in [`package.json`](./package.json)
+> Full list in [`requirements.txt`](./requirements.txt)
 
 ---
 
 ## 🚀 Run Locally
 
-### Prerequisites
-- Node.js >= 18
-- Backend server running (see [backend repo](https://github.com/jjannat04/dhaka-threads-backend))
-
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/jjannat04/dhaka-threads-client.git
-cd dhaka-threads-client
+git clone https://github.com/jjannat04/dhaka-threads-backend.git
+cd dhaka-threads-backend
 ```
 
-### 2. Install Dependencies
+### 2. Create & Activate Virtual Environment
 
 ```bash
-npm install
+# Windows
+python -m venv venv
+venv\Scripts\activate
+
+# macOS / Linux
+python3 -m venv venv
+source venv/bin/activate
 ```
 
-### 3. Configure Environment Variables
+### 3. Install Dependencies
 
-Create a `.env` file in the root directory:
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Configure Environment Variables
+
+Create a `.env` file in the root:
 
 ```env
-REACT_APP_API_URL=http://127.0.0.1:8000/api
+SECRET_KEY=your-django-secret-key
+DEBUG=True
+DATABASE_URL=sqlite:///db.sqlite3
+ALLOWED_HOSTS=localhost,127.0.0.1
 ```
 
-### 4. Start the Development Server
+### 5. Apply Migrations
 
 ```bash
-npm start
+python manage.py makemigrations
+python manage.py migrate
 ```
 
-Open your browser at 👉 `http://localhost:3000`
+### 6. Create Superuser
+
+```bash
+python manage.py createsuperuser
+```
+
+### 7. Run the Server
+
+```bash
+python manage.py runserver
+```
+
+API available at 👉 `http://127.0.0.1:8000/api/`
+Admin panel at 👉 `http://127.0.0.1:8000/admin/`
 
 ---
 
@@ -97,7 +118,7 @@ Open your browser at 👉 `http://localhost:3000`
 | Resource | Link |
 |----------|------|
 | 🌐 Live Demo | [dhaka-threads-client.vercel.app](https://dhaka-threads-client.vercel.app/) |
-| 💻 Frontend Repo | [github.com/jjannat04/dhaka-threads-client](https://github.com/jjannat04/dhaka-threads-client) |
+| 🖥️ Frontend Repo | [github.com/jjannat04/dhaka-threads-client](https://github.com/jjannat04/dhaka-threads-client) |
 | 🔧 Backend Repo | [github.com/jjannat04/dhaka-threads-backend](https://github.com/jjannat04/dhaka-threads-backend) |
 | 👤 Developer | [linkedin.com/in/jannatul-ferdous-b504831b3](https://www.linkedin.com/in/jannatul-ferdous-b504831b3/) |
 
